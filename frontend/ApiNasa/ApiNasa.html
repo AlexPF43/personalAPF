@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/frontend/Estilos/styiles.css">
+    <title>ApiNasa</title>
+</head>
+<body>
+    <h1 class="headerApiNasa">IMAGEN DEL DIA</h1>
+    <h2 id="titulo-nasa">Cargando título...</h2>
+    <img id="imagen-nasa" alt="Imagen astronómica del día de la NASA">
+    <p id="explicacion-nasa">Cargando explicación...</p>
+    <p id="copyright-nasa"></p>
+    <p id="fecha-nasa"></p>
+
+
+    <script>
+        function cargarDatos() {
+            const titulo = document.getElementById("titulo-nasa");
+            const imagen = document.getElementById("imagen-nasa");
+            const explicacion = document.getElementById("explicacion-nasa");
+            const copyright = document.getElementById("copyright-nasa");
+            const fecha = document.getElementById("fecha-nasa");
+
+            fetch("https://api.nasa.gov/planetary/apod?api_key=IQA0Qmbm4bRKlMvpGBCymq2F5MsnHaCrRhZTxAJf")
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("No se pudieron obtener los datos.");
+                    }
+
+                    return response.json();
+                })
+                .then((data) => {
+                    titulo.textContent = data.title;
+                    imagen.src = data.hdurl || data.url;
+                    explicacion.textContent = data.explanation;
+                    copyright.textContent = `Copyright: ${data.copyright || "No disponible"}`;
+                    fecha.textContent = `Fecha: ${data.date}`;
+                })
+                .catch(() => {
+                    titulo.textContent = "No se pudieron cargar los datos de la NASA.";
+                    imagen.removeAttribute("src");
+                    explicacion.textContent = "Ha ocurrido un error al obtener los datos.";
+                    copyright.textContent = "";
+                    fecha.textContent = "";
+                });
+        }
+
+        cargarDatos();
+    </script>
+</body>
+</html>
