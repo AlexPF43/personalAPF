@@ -1,27 +1,56 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/frontend/Estilos/styiles.css">
+    <link rel="stylesheet" href="/frontend/Estilos/styles.css">
     <title>ApiNasa</title>
 </head>
 <body>
     <h1 class="headerApiNasa">IMAGEN DEL DIA</h1>
-    <h2 id="titulo-nasa">Cargando título...</h2>
-    <img id="imagen-nasa" alt="Image">
-    <p id="explicacion-nasa">Cargando explicación...</p>
-    <p id="copyright-nasa">copyright</p>
-    <p id="fecha-nasa">YYYY-MM-DD</p>
+    <main class="contenido">
+    <div class="visual">
+        <div class="contenedor-imagen">
+            <img id="imagen" alt="Image">
+
+            <div class="controles-imagen">
+                <button type="button" class="boton-icono" aria-label="Ampliar imagen">
+                    <a id="ampliar">
+                        <img src="/media/btn-ampliar.png" alt="">
+                    </a>
+                </button>
+                <button type="button" class="boton-icono" aria-label="Descargar imagen">
+                    <a id="descargar" download="imagen-apiNasa.jpg">
+                        <img src="/media/btn-descargar.png" alt="">
+                    </a>
+                </button>
+            </div>
+        </div>
+        <p id="fecha">YYYY-MM-DD</p>
+
+        <div class="acciones">
+            <button type="button">Seleccionar fecha</button>
+            <button type="button">Hoy</button>
+            <button type="button">Ayer</button>
+            <button type="button">Aleatorio</button>
+        </div>
+    </div>
+
+    <div class="titulo"><h2 id="titulo">Cargando título...</h2></div>
+    <div class="descripcion"><p id="explicacion">Cargando explicación...</p></div>
+    <div class="copyr"><p id="copyright">copyright</p></div>
+    </main>
 
 
     <script>
         function cargarDatos() {
-            const titulo = document.getElementById("titulo-nasa");
-            const imagen = document.getElementById("imagen-nasa");
-            const explicacion = document.getElementById("explicacion-nasa");
-            const copyright = document.getElementById("copyright-nasa");
-            const fecha = document.getElementById("fecha-nasa");
+            const titulo = document.getElementById("titulo");
+            const imagen = document.getElementById("imagen");
+            const explicacion = document.getElementById("explicacion");
+            const copyright = document.getElementById("copyright");
+            const fecha = document.getElementById("fecha");
+            const descarga = document.getElementById("descargar");
+            const ampliacion = document.getElementById("ampliar");
 
             fetch("https://api.nasa.gov/planetary/apod?api_key=IQA0Qmbm4bRKlMvpGBCymq2F5MsnHaCrRhZTxAJf&date=2020-02-6")
                 .then((response) => {
@@ -35,6 +64,8 @@
                     titulo.textContent = data.title;
                     imagen.alt=data.url;
                     imagen.src = data.hdurl || data.url;
+                    descarga.href = data.hdurl || data.url;
+                    ampliacion.href=data.hdurl || data.url;
                     explicacion.textContent = data.explanation;
                     copyright.textContent = `Copyright: ${data.copyright || "No disponible"}`;
                     fecha.textContent = `Fecha: ${data.date}`;
@@ -45,10 +76,10 @@
                     explicacion.textContent = "-";
                     copyright.textContent = "-";
                     fecha.textContent = "";
-                    const mensajeError = document.createElement("p");
-                    mensajeError.style.color="#c43030"
-                    mensajeError.style.fontSize="32px"
-                    mensajeError.textContent="No se han podido obtener los datos de la api"
+                        const mensajeError = document.createElement("p");
+                        mensajeError.style.color="#c43030"
+                        mensajeError.style.fontSize="32px"
+                        mensajeError.textContent="No se han podido obtener los datos de la api"
                     document.body.appendChild(mensajeError);
                 });
         }
