@@ -9,10 +9,10 @@
 <body>
     <h1 class="headerApiNasa">IMAGEN DEL DIA</h1>
     <h2 id="titulo-nasa">Cargando título...</h2>
-    <img id="imagen-nasa" alt="Imagen astronómica del día de la NASA">
+    <img id="imagen-nasa" alt="Image">
     <p id="explicacion-nasa">Cargando explicación...</p>
-    <p id="copyright-nasa"></p>
-    <p id="fecha-nasa"></p>
+    <p id="copyright-nasa">copyright</p>
+    <p id="fecha-nasa">YYYY-MM-DD</p>
 
 
     <script>
@@ -23,7 +23,7 @@
             const copyright = document.getElementById("copyright-nasa");
             const fecha = document.getElementById("fecha-nasa");
 
-            fetch("https://api.nasa.gov/planetary/apod?api_key=IQA0Qmbm4bRKlMvpGBCymq2F5MsnHaCrRhZTxAJf")
+            fetch("https://api.nasa.gov/planetary/apod?api_key=IQA0Qmbm4bRKlMvpGBCymq2F5MsnHaCrRhZTxAJf&date=2020-02-6")
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("No se pudieron obtener los datos.");
@@ -33,17 +33,23 @@
                 })
                 .then((data) => {
                     titulo.textContent = data.title;
+                    imagen.alt=data.url;
                     imagen.src = data.hdurl || data.url;
                     explicacion.textContent = data.explanation;
                     copyright.textContent = `Copyright: ${data.copyright || "No disponible"}`;
                     fecha.textContent = `Fecha: ${data.date}`;
                 })
                 .catch(() => {
-                    titulo.textContent = "No se pudieron cargar los datos de la NASA.";
+                    titulo.textContent = "-";
                     imagen.removeAttribute("src");
-                    explicacion.textContent = "Ha ocurrido un error al obtener los datos.";
-                    copyright.textContent = "";
+                    explicacion.textContent = "-";
+                    copyright.textContent = "-";
                     fecha.textContent = "";
+                    const mensajeError = document.createElement("p");
+                    mensajeError.style.color="#c43030"
+                    mensajeError.style.fontSize="32px"
+                    mensajeError.textContent="No se han podido obtener los datos de la api"
+                    document.body.appendChild(mensajeError);
                 });
         }
 
