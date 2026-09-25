@@ -1,49 +1,73 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
+
 <head>
+    <link rel="stylesheet" href="../Estilos/styles.css">
+    <link rel="icon" type="image/x-icon" href="./media/www-icon.png">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/frontend/Estilos/styles.css">
-    <title>ApiNasa</title>
+    <!-- Evitar almacenamiento en caché -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+        <meta http-equiv="Pragma" content="no-cache">
+        <meta http-equiv="Expires" content="0">
+
+        <title>ApiNasa</title>
 </head>
+
 <body>
     <h1 class="headerApiNasa">IMAGEN DEL DIA</h1>
-    <main class="contenido">
-    <div class="visual">
-        <div class="contenedor-imagen">
-            <img id="imagen" alt="Image">
+    <main id="cont" class="contenido">
+        <div id="visual" class="visual">
+            <div id="contenedor-imagen" class="contenedor-imagen">
+                <img id="imagen" alt="Image">
 
-            <div class="controles-imagen">
-                <button type="button" class="boton-icono" aria-label="Ampliar imagen">
-                    <a id="ampliar">
-                        <img src="/media/btn-ampliar.png" alt="">
-                    </a>
-                </button>
-                <button type="button" class="boton-icono" aria-label="Descargar imagen">
-                    <a id="descargar" download="imagen-apiNasa.jpg">
-                        <img src="/media/btn-descargar.png" alt="">
-                    </a>
-                </button>
+                <div class="controles-imagen">
+                    <button id="ampliar" type="button" class="boton-icono" onclick="abrirImg()">
+                        <img src="../../media/btn-ampliar.png" alt="">
+                    </button>
+                    
+                    <button type="button" class="boton-icono" aria-label="Descargar imagen" onclick="descargar()">
+                        <img src="../../media/btn-descargar.png" alt="">
+                    </button>
+                </div>
+            </div>
+            <p id="fecha">YYYY-MM-DD</p>
+
+            <div class="acciones">
+                <button id="btnSleccFech" type="button" onclick="accionBotonSelecFech()">Seleccionar fecha</button>
+                <button id="btnHoy" type="button" onclick="accionBoton('hoy')">Hoy</button>
+                <button id="btnAyer" type="button" onclick="accionBoton('ayer')">Ayer</button>
+                <button id="btnRandm" type="button" onclick="accionBoton('rndm')">Aleatorio</button>
             </div>
         </div>
-        <p id="fecha">YYYY-MM-DD</p>
 
-        <div class="acciones">
-            <button type="button">Seleccionar fecha</button>
-            <button type="button">Hoy</button>
-            <button type="button">Ayer</button>
-            <button type="button">Aleatorio</button>
+        <div class="info-panel">
+            <div class="titulo">
+                <h2 id="titulo">Cargando título...</h2>
+            </div>
+            <div id="descripcion" class="descripcion">
+                <p id="explicacion">Cargando explicación...</p>
+            </div>
+            <div class="copyr">
+                <p id="copyright">copyright</p>
+            </div>
+            <div class="traducir">
+                <button id="btnTrad" onclick="traducir()">Traducir texto</button>
+            </div>
         </div>
-    </div>
 
-    <div class="titulo"><h2 id="titulo">Cargando título...</h2></div>
-    <div class="descripcion"><p id="explicacion">Cargando explicación...</p></div>
-    <div class="copyr"><p id="copyright">copyright</p></div>
+
     </main>
 
 
     <script>
-        function cargarDatos() {
+        let fechaMostrada = new Date();
+        const baseURL="http://198.23.57.28"
+        const apiUrl = baseURL+"/api/apod";
+
+        function cargarDatos(urlFetch) {
+
             const titulo = document.getElementById("titulo");
             const imagen = document.getElementById("imagen");
             const explicacion = document.getElementById("explicacion");
@@ -52,7 +76,10 @@
             const descarga = document.getElementById("descargar");
             const ampliacion = document.getElementById("ampliar");
 
-            fetch("https://api.nasa.gov/planetary/apod?api_key=IQA0Qmbm4bRKlMvpGBCymq2F5MsnHaCrRhZTxAJf&date=2020-02-6")
+            //Botones
+            const btnSlecc = document.getElementById("btnSleccFech");
+
+            fetch(urlFetch)
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("No se pudieron obtener los datos.");
@@ -62,29 +89,162 @@
                 })
                 .then((data) => {
                     titulo.textContent = data.title;
-                    imagen.alt=data.url;
+                    imagen.alt = data.url;
                     imagen.src = data.hdurl || data.url;
-                    descarga.href = data.hdurl || data.url;
-                    ampliacion.href=data.hdurl || data.url;
+                    ampliacion.href = data.hdurl || data.url;
                     explicacion.textContent = data.explanation;
                     copyright.textContent = `Copyright: ${data.copyright || "No disponible"}`;
                     fecha.textContent = `Fecha: ${data.date}`;
+                    fechaMostrada = new Date(`${data.date}T12:00:00`);
                 })
                 .catch(() => {
+                    console.log("Get: " + urlFetch);
+
                     titulo.textContent = "-";
                     imagen.removeAttribute("src");
                     explicacion.textContent = "-";
                     copyright.textContent = "-";
                     fecha.textContent = "";
-                        const mensajeError = document.createElement("p");
-                        mensajeError.style.color="#c43030"
-                        mensajeError.style.fontSize="32px"
-                        mensajeError.textContent="No se han podido obtener los datos de la api"
+                    const mensajeError = document.createElement("p");
+                    mensajeError.style.color = "#c43030"
+                    mensajeError.style.fontSize = "32px"
+                    mensajeError.textContent = "No se han podido obtener los datos de la api"
                     document.body.appendChild(mensajeError);
                 });
         }
 
-        cargarDatos();
+        cargarDatos(apiUrl);
+
+        function accionBoton(fecha) {
+
+            const imagen = document.getElementById("imagen");
+
+            imagen.removeAttribute("src");
+            imagen.alt = "Cargando imagen...";
+
+            if (fecha === "hoy") {
+                cargarDatos(apiUrl);
+            } else if (fecha === "ayer") {
+                const fechaAyer = new Date(fechaMostrada);
+                fechaAyer.setDate(fechaAyer.getDate() - 1);
+
+                const año = fechaAyer.getFullYear();
+                const mes = String(fechaAyer.getMonth() + 1).padStart(2, "0");
+                const dia = String(fechaAyer.getDate()).padStart(2, "0");
+
+                cargarDatos(`${apiUrl}?date=${año}-${mes}-${dia}`);
+            } else if (fecha === "rndm") {
+                const fechaInicio = new Date(1995, 5, 16);
+                const fechaActual = new Date();
+                const fechaAleatoria = new Date(
+                    fechaInicio.getTime() + Math.random() * (fechaActual.getTime() - fechaInicio.getTime())
+                );
+
+                const año = fechaAleatoria.getFullYear();
+                const mes = String(fechaAleatoria.getMonth() + 1).padStart(2, "0");
+                const dia = String(fechaAleatoria.getDate()).padStart(2, "0");
+
+                cargarDatos(`${apiUrl}?date=${año}-${mes}-${dia}`);
+
+            }
+        }
+
+        function accionBotonSelecFech() {
+            let modal = document.getElementById("contenedor-fecha");
+            if (modal) {
+                modal.style.display = modal.style.display === "none" ? "flex" : "none";
+                return;
+            }
+
+            modal = document.createElement("div");
+            modal.id = "contenedor-fecha";
+            modal.className = "modal-fecha";
+
+            const contenido = document.createElement("div");
+            contenido.className = "modal-contenido";
+
+            const btnCerrar = document.createElement("button");
+            btnCerrar.className = "cerrar-modal";
+            btnCerrar.innerHTML = "&times;";
+            btnCerrar.setAttribute("aria-label", "Cerrar");
+            btnCerrar.onclick = function () {
+                modal.style.display = "none";
+            };
+
+            const parr = document.createElement("p");
+            parr.textContent = "Seleccionar fecha:";
+
+            const input = document.createElement("input");
+            input.type = "date";
+
+            const hoy = new Date().toISOString().split("T")[0];
+            input.max = hoy;
+
+            input.addEventListener("change", function () {
+                if (this.value) {
+                    const imagen = document.getElementById("imagen");
+                    imagen.removeAttribute("src");
+                    imagen.alt = "Cargando imagen...";
+                    cargarDatos(`${apiUrl}?date=${this.value}`);
+                    modal.style.display = "none";
+                }
+            });
+
+            modal.addEventListener("click", function (e) {
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            contenido.appendChild(btnCerrar);
+            contenido.appendChild(parr);
+            contenido.appendChild(input);
+            modal.appendChild(contenido);
+            document.body.appendChild(modal);
+        }
+
+        function traducir() {
+            desc=document.getElementById("descripcion")
+            boton=document.getElementById("btnTrad")
+            textoActual=desc.textContent;
+
+            if(boton.textContent==="Original"){
+                desc.textContent=explicacion.
+                boton.textContent="Traducir"
+            }else{
+            //http://127.0.0.1:5000/translate?text="+textoActual
+            prueba=baseURL+"/translate?text="+textoActual
+            fetch(prueba)
+            .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("No se pudieron obtener los datos.");
+                    }
+
+                    return response.json();
+                }).then((data) => {
+                    
+                    traducido=data.data.translations[0].translatedText
+                    desc.textContent=traducido
+                    boton.textContent="Original"
+
+                })
+            }
+        }
+
+        function abrirImg(){
+            const imagen = document.getElementById("imagen");
+            enlaceImg=imagen.src
+            console.log(enlaceImg)
+            window.open(enlaceImg)
+            
+        }
+
+        function descargar(){
+            print()
+            //Es lo mejor que pude hacer de momento :)
+        }
+
     </script>
 </body>
+
 </html>
