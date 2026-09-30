@@ -8,7 +8,7 @@ from flask import Flask, jsonify, request
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 api = Flask(__name__)
-API_NASA_URL = "https://science.nasa.gov/wp-json/wp/v2/apod-basic"
+API_NASA_URL = "https://api.nasa.gov/planetary/apod"
 
 
 @api.after_request
